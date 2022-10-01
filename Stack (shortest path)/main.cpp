@@ -1,5 +1,4 @@
 #include "stack.h"
-// stack method, fill from the dest
 
 int main()
 {
@@ -17,29 +16,29 @@ int main()
             cin >> map[i][j];
     }
 
-    int x = m - 1, y = m - 1;
+    int x = 0, y = 0;
     Stack path;
 
-    while(x != 1 || y != 1)
+    while(x != m - 1 || y != m - 1)
     {
-        if (map[y - 1][x] == 1 && y > 1) // path avail in (x, y - 1), mark S
-        {
-            y--;
-            path.push('S');
-        }
-        else if (map[y][x - 1] == 1 && x > 1) // path avail in (x - 1, y), mark E
-        {
-            x--;
-            path.push('E');
-        }
-        else if (map[y + 1][x] == 1 && y < m - 1) // path avail in (x, y + 1), mark N
+        if (map[y + 1][x] == 1 && y < m - 1)      // check path avail in (x, y+1), mark S
         {
             y++;
-            path.push('N');
+            path.push('S');
         }
-        else if (map[y][x + 1] == 1 && x < m - 1) // path avail in (x + 1, y), mark W
+        else if (map[y][x + 1] == 1 && x < m - 1) // check path avail in (x+1, y), mark E
         {
             x++;
+            path.push('E');
+        }
+        else if (map[y - 1][x] == 1 && y > 0)    // path avail in (x, y-1), mark N
+        {
+            y--;
+            path.push('N');
+        }
+        else if (map[y][x - 1] == 1 && x > 0)    // path avail in (x-1, y), mark W
+        {
+            x--;
             path.push('W');
         }
     }
