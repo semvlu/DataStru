@@ -155,18 +155,6 @@ class AVLTree(object):
             print(root.k, end = ' ')
             self.inorder(root.right)
 
-    def printHelper(self, currPtr, indent, last):
-        if currPtr != None:
-            sys.stdout.write(indent)
-            if last:
-                sys.stdout.write("R----")
-                indent += "     "
-            else:
-                sys.stdout.write("L----")
-                indent += "|    "
-            print(currPtr.k)
-            self.printHelper(currPtr.left, indent, False)
-            self.printHelper(currPtr.right, indent, True)
 
 # main
 t = AVLTree()

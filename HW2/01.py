@@ -16,23 +16,38 @@ def insert(root, k):
             root.left = insert(root.left, k)
     return root 
  
-def inorder(root):
+def inorder(root, n):
+    cnt = 0
     if root:
-        inorder(root.left)
-        print(root.val, end = ' ')
-        inorder(root.right)
+        inorder(root.left, n)
+        if(cnt < n - 1):
+            print(root.val, end = ' ')
+            cnt += 1
+        else:
+            print(root.val)
+        inorder(root.right, n)
 
-def preorder(root):
+def preorder(root, n):
+    cnt = 0
     if root:
-        print(root.val, end = ' ')
-        preorder(root.left)
-        preorder(root.right)
+        if(cnt < n - 1):
+            print(root.val, end = ' ')
+            cnt += 1
+        else:
+           print(root.val)
+        preorder(root.left, n)
+        preorder(root.right, n)
 
-def postorder(root):
+def postorder(root, n):
+    cnt = 0
     if root:
-        postorder(root.left)
-        postorder(root.right)
-        print(root.val, end = ' ')
+        postorder(root.left, n)
+        postorder(root.right, n)
+        if(cnt < n - 1):
+            print(root.val, end = ' ')
+            cnt += 1
+        else:
+            print(root.val)
 
 # main
 a = list(map(int, input().split()))
@@ -42,9 +57,9 @@ for i in (a):
     if i != 0:
         r = insert(r, i)
 
-inorder(r)
+inorder(r, len(a))
 print()
-preorder(r)
+preorder(r, len(a))
 print()
-postorder(r)
+postorder(r, len(a))
 print()
