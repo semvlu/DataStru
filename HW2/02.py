@@ -1,4 +1,3 @@
-import sys
 cnt = 0
 rot = list()
 class TreeNode(object):
@@ -178,12 +177,7 @@ while True:
     line = input()
 
     if line:
-        num = []
-        for i in line.split():
-            try:
-                num.append(int(i))
-            except ValueError:
-                pass
+        num = [int(s) for s in line.split() if s.isdigit()]
 
         if line[0] == 'I':
             t.insert(root, num[0])
@@ -192,6 +186,7 @@ while True:
 
     else:
         break
+
 
 
 t.inorder(root)

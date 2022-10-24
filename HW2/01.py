@@ -2,7 +2,7 @@ class Node:
     def __init__(self, k):
         self.left = None
         self.right = None
-        self.val = k
+        self.val = int(k)
  
 def insert(root, k):
     if root is None:
@@ -11,9 +11,9 @@ def insert(root, k):
         if root.val == k:
             return root
         elif root.val < k:
-            root.right = insert(root.right, k)
+            root.right = insert(root.right, int(k))
         else:
-            root.left = insert(root.left, k)
+            root.left = insert(root.left, int(k))
     return root 
  
 def inorder(root, n):
@@ -55,7 +55,7 @@ a = list(map(int, input().split()))
 r = Node(a[0])
 for i in (a):
     if i != 0:
-        r = insert(r, i)
+        r = insert(r, int(i))
 
 inorder(r, len(a))
 print()
