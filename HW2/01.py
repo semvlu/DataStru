@@ -1,3 +1,7 @@
+cntin = 0
+cntpre = 0
+cntpost = 0
+
 class Node:
     def __init__(self, k):
         self.left = None
@@ -6,7 +10,7 @@ class Node:
  
 def insert(root, k):
     if root is None:
-        return Node(k)
+        return Node(int(k))
     else:
         if root.val == k:
             return root
@@ -17,35 +21,35 @@ def insert(root, k):
     return root 
  
 def inorder(root, n):
-    cnt = 0
+    global cntin
     if root:
         inorder(root.left, n)
-        if(cnt < n - 1):
-            print(root.val, end = ' ')
-            cnt += 1
+        if(cntin < n - 1):
+            print(root.val, end=' ')
+            cntin += 1
         else:
             print(root.val)
         inorder(root.right, n)
 
 def preorder(root, n):
-    cnt = 0
+    global cntpre
     if root:
-        if(cnt < n - 1):
+        if(cntpre < n - 1):
             print(root.val, end = ' ')
-            cnt += 1
+            cntpre += 1
         else:
            print(root.val)
         preorder(root.left, n)
         preorder(root.right, n)
 
 def postorder(root, n):
-    cnt = 0
+    global cntpost
     if root:
         postorder(root.left, n)
         postorder(root.right, n)
-        if(cnt < n - 1):
+        if(cntpost < n - 1):
             print(root.val, end = ' ')
-            cnt += 1
+            cntpost += 1
         else:
             print(root.val)
 
@@ -58,8 +62,5 @@ for i in (a):
         r = insert(r, int(i))
 
 inorder(r, len(a))
-print()
 preorder(r, len(a))
-print()
 postorder(r, len(a))
-print()
