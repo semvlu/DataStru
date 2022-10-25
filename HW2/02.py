@@ -182,7 +182,9 @@ while True:
         line = input()
         line = str(line)
         num = [int(s) for s in line.split() if s.isdigit()]
-        if line:
+        if line == '':
+            break
+        elif line:
             if line[0] == 'I':
                 t.insert(root, num[0])
                 size += 1
