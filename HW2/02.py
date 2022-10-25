@@ -1,4 +1,6 @@
 cnt = 0
+cntin = 0
+size = 0
 rot = list()
 class TreeNode(object):
     def __init__(self, k):
@@ -20,15 +22,13 @@ class AVLTree(object):
 
         root.height = 1 + max(self.getHeight(root.left), self.getHeight(root.right))
 
-
         blnc = self.getBalance(root)
         if blnc > 1: # Lx
             cnt += 1
             if k < root.left.k: # LL
                 rot.append("LL")
                 return self.rightRotate(root)
-                
-                
+                    
             else: # LR
                 rot.append("LR")
                 root.left = self.leftRotate(root.left)
@@ -41,13 +41,11 @@ class AVLTree(object):
                 rot.append("RR")
                 return self.leftRotate(root)
                 
-
             else: # RL
                 rot.append("RL")
                 root.right = self.rightRotate(root.right)
                 return self.leftRotate(root)
                 
-
         return root
 
     def delete(self, root, k):
@@ -70,16 +68,16 @@ class AVLTree(object):
             temp = self.getMinValueNode(root.right)
             root.k = temp.k
             root.right = self.delete(root.right, temp.k)
+
         if root is None:
             return root
 
-        root.height = 1 + max(self.getHeight(root.left),
-                              self.getHeight(root.right))
+        root.height = 1 + max(self.getHeight(root.left), self.getHeight(root.right))
 
         blnc = self.getBalance(root)
-# R0: LL, RR
-# R1: LL, RL
-#R-1: RR, LR
+        # R0: LL, RR
+        # R1: LL, RL
+        #R-1: RR, LR
         if blnc > 1: # Lx
             cnt += 1
             if self.getBalance(root.left) > 0: # LL (R1)
@@ -148,12 +146,16 @@ class AVLTree(object):
             return root
         return self.getMinValueNode(root.left)
 
-    def inorder(self, root):
-        if root:
-            self.inorder(root.left)
-            print(root.k, end = ' ')
-            self.inorder(root.right)
-
+def inorder(root, n):
+    global cntin
+    if root:
+        inorder(root.left,n)
+        if(cntin < n - 1):
+            print(root.k, end=' ')
+            cntin += 1
+        else:
+            print(root.k)
+        inorder(root.right,n)
 
 # main
 t = AVLTree()
@@ -171,26 +173,26 @@ for i in instr.split(","):
 
 for i in ar:
     root = t.insert(root, i)
+    size += 1
 
 # commands begin from ln 2
+
 while True:
-    line = input()
-
-    if line:
+    try:
+        line = input()
+        line = str(line)
         num = [int(s) for s in line.split() if s.isdigit()]
-
-        if line[0] == 'I':
-            t.insert(root, num[0])
-        elif line[0] == 'D':
-            t.delete(root, num[0])
-
-    else:
+        if line:
+            if line[0] == 'I':
+                t.insert(root, num[0])
+                size += 1
+            elif line[0] == 'D':
+                t.delete(root, num[0])
+                size -= 1
+    except EOFError:
         break
-
-
-
-t.inorder(root)
-print()
+    
+inorder(root, size)
 print(cnt)
 for i in range(0,len(rot)):
     if(i != len(rot) - 1):
