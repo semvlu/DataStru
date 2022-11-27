@@ -1,174 +1,118 @@
-import sys
-cntpre = 0
-"""
-level-order 每個顏色排序後 Last 3 nodes -> 外場    else內場
-
-排序後 1st node -> 跳球
-外場 & 跳球不能是同一人
-if 外場 < 3 or 沒有跳球 -> No game
---------------------------------------
-
-OUT:
-Red team: 紅座號 (小至大, 逗點分隔)
-outfield: 紅外場座號 (小至大, 逗點分隔)
-jump ball: 紅跳球
-Black team: 黑座號(小至大, 逗點分隔)
-outfield: 黑外場座號(小至大, 逗點分隔)
-jump ball: 黑跳球
---------------------------------------
-No game
-"""
-
-class Node():
-    def __init__(self, item):
-        self.item = item
+Rteam = []
+Ro = []
+Bteam = []
+Bo = []
+class RBNode:
+    def __init__(self, val):
+        self.red = False
         self.parent = None
+        self.val = val
         self.left = None
         self.right = None
-        self.color = 1
 
 
-class RedBlackTree():
+class RBTree:
     def __init__(self):
-        self.TNULL = Node(0)
-        self.TNULL.color = 0
-        self.TNULL.left = None
-        self.TNULL.right = None
-        self.root = self.TNULL
+        self.nil = RBNode(0)
+        self.nil.red = False
+        self.nil.left = None
+        self.nil.right = None
+        self.root = self.nil
+
+    def insert(self, val):
+        new_node = RBNode(val)
+        new_node.parent = None
+        new_node.left = self.nil
+        new_node.right = self.nil
+        new_node.red = True
+
+        parent = None
+        current = self.root
+        while current != self.nil:
+            parent = current
+
+            # 2a: node w/ 2 red children
+            if parent.left.red == True and parent.right.red == True:
+                parent.red = True
+                parent.left.red = False
+                parent.right.red = False
+
+            # 2b: 2 cons red nodes
+            if parent.red == True:
+                if parent.parent.red == True:
+                    if parent == parent.parent.left: # xL
+                        if parent.parent == parent.parent.parent.left: # LL
+                            self.Lrotate(parent)
+                            self.Lrotate(parent)
+                        elif parent.parent == parent.parent.parent.right: # RL
+                            self.Rrotate(parent)
+                            self.Lrotate(parent)
+                    elif parent == parent.parent.right: # xR
+                        if parent.parent == parent.parent.parent.left: # LR
+                            self.Lrotate(parent)
+                            self.Rrotate(parent)
+                        elif parent.parent == parent.parent.parent.right: # RR
+                            self.Rrotate(parent)
+                            self.Rrotate(parent)
 
 
-    # Preorder
-    def pre_order_helper(self, node, n):
-        global cntpre
-        if node != self.TNULL:
-            if(cntpre < n - 1):
-                print(node.item, end=',')
-                cntpre += 1
+            if new_node.val < current.val:
+                current = current.left
+            elif new_node.val > current.val:
+                current = current.right
             else:
-                print(node.item)
-            self.pre_order_helper(node.left)
-            self.pre_order_helper(node.right)
-    def preorder(self, n):
-        self.pre_order_helper(self.root, n)
+                return
 
-    # Inorder
-    def in_order_helper(self, node):
-        if node != TNULL:
-            self.in_order_helper(node.left)
-            sys.stdout.write(node.item + ",")
-            self.in_order_helper(node.right)
-    def inorder(self):
-        self.in_order_helper(self.root)
 
-    # Postorder
-    def post_order_helper(self, node):
-        if node != TNULL:
-            self.post_order_helper(node.left)
-            self.post_order_helper(node.right)
-            sys.stdout.write(node.item + ",")
-    def postorder(self):
-        self.post_order_helper(self.root)
+        new_node.parent = parent
+        if parent == None:
+            self.root = new_node
+        elif new_node.val < parent.val:
+            parent.left = new_node
+        else:
+            parent.right = new_node
 
-    # Search the tree
-    def search_tree_helper(self, node, key):
-        if node == TNULL or key == node.item:
-            return node
+        # Fix the tree
+        self.fix_insert(new_node)
 
-        if key < node.item:
-            return self.search_tree_helper(node.left, key)
-        return self.search_tree_helper(node.right, key)
-
-    # Balance the tree after insertion
-    def fix_insert(self, k):
-        while k.parent.color == 1:
-            if k.parent == k.parent.parent.right:
-                u = k.parent.parent.left
-                if u.color == 1:
-                    u.color = 0
-                    k.parent.color = 0
-                    k.parent.parent.color = 1
-                    k = k.parent.parent
+    def fix_insert(self, new_node):
+        while new_node != self.root and new_node.parent.red:
+            if new_node.parent == new_node.parent.parent.right:
+                u = new_node.parent.parent.left
+                if u.red:
+                    u.red = False
+                    new_node.parent.red = False
+                    new_node.parent.parent.red = True
+                    new_node = new_node.parent.parent
                 else:
-                    if k == k.parent.left:
-                        k = k.parent
-                        self.right_rotate(k)
-                    k.parent.color = 0
-                    k.parent.parent.color = 1
-                    self.left_rotate(k.parent.parent)
+                    if new_node == new_node.parent.left:
+                        new_node = new_node.parent
+                        self.Rrotate(new_node)
+                    new_node.parent.red = False
+                    new_node.parent.parent.red = True
+                    self.Lrotate(new_node.parent.parent)
             else:
-                u = k.parent.parent.right
+                u = new_node.parent.parent.right
 
-                if u.color == 1:
-                    u.color = 0
-                    k.parent.color = 0
-                    k.parent.parent.color = 1
-                    k = k.parent.parent
+                if u.red:
+                    u.red = False
+                    new_node.parent.red = False
+                    new_node.parent.parent.red = True
+                    new_node = new_node.parent.parent
                 else:
-                    if k == k.parent.right:
-                        k = k.parent
-                        self.left_rotate(k)
-                    k.parent.color = 0
-                    k.parent.parent.color = 1
-                    self.right_rotate(k.parent.parent)
-            if k == self.root:
-                break
-        self.root.color = 0
+                    if new_node == new_node.parent.right:
+                        new_node = new_node.parent
+                        self.Lrotate(new_node)
+                    new_node.parent.red = False
+                    new_node.parent.parent.red = True
+                    self.Rrotate(new_node.parent.parent)
+        self.root.red = False
 
-    # Printing the tree
-    def __print_helper(self, node, indent, last):
-        if node != self.TNULL:
-            sys.stdout.write(indent)
-            if last:
-                sys.stdout.write("R----")
-                indent += "     "
-            else:
-                sys.stdout.write("L----")
-                indent += "|    "
-
-            s_color = "R" if node.color == 1 else "B"
-            print(str(node.item) + "(" + s_color + ")")
-            self.__print_helper(node.left, indent, False)
-            self.__print_helper(node.right, indent, True)
-
-
-    def searchTree(self, k):
-        return self.search_tree_helper(self.root, k)
-
-    def minimum(self, node):
-        while node.left != self.TNULL:
-            node = node.left
-        return node
-
-    def maximum(self, node):
-        while node.right != self.TNULL:
-            node = node.right
-        return node
-
-    def successor(self, x):
-        if x.right != self.TNULL:
-            return self.minimum(x.right)
-
-        y = x.parent
-        while y != self.TNULL and x == y.right:
-            x = y
-            y = y.parent
-        return y
-
-    def predecessor(self,  x):
-        if (x.left != self.TNULL):
-            return self.maximum(x.left)
-
-        y = x.parent
-        while y != self.TNULL and x == y.left:
-            x = y
-            y = y.parent
-
-        return y
-
-    def left_rotate(self, x):
+    # L rotate
+    def Lrotate(self, x):
         y = x.right
         x.right = y.left
-        if y.left != self.TNULL:
+        if y.left != self.nil:
             y.left.parent = x
 
         y.parent = x.parent
@@ -181,10 +125,11 @@ class RedBlackTree():
         y.left = x
         x.parent = y
 
-    def right_rotate(self, x):
+    # R rotate
+    def Rrotate(self, x):
         y = x.left
         x.left = y.right
-        if y.right != self.TNULL:
+        if y.right != self.nil:
             y.right.parent = x
 
         y.parent = x.parent
@@ -197,60 +142,116 @@ class RedBlackTree():
         y.right = x
         x.parent = y
 
-    def insert(self, key):
-        node = Node(key)
-        node.parent = None
-        node.item = key
-        node.left = self.TNULL
-        node.right = self.TNULL
-        node.color = 1
+    def __repr__(self):
+        lines = []
+        print_tree(self.root, lines)
+        return '\n'.join(lines)
 
-        y = None
-        x = self.root
 
-        while x != self.TNULL:
-            y = x
-            if node.item < x.item:
-                x = x.left
-            else:
-                x = x.right
+def print_tree(node, lines, level=0):
+    if node.val != 0:
+        print_tree(node.left, lines, level + 1)
+        lines.append('-' * 4 * level + '> ' +
+                     str(node.val) + ' ' + ('r' if node.red else 'b'))
+        print_tree(node.right, lines, level + 1)
 
-        node.parent = y
-        if y == None:
-            self.root = node
-        elif node.item < y.item:
-            y.left = node
+
+def lvlord(root):
+    h = height(root)
+    
+    for i in range(1, h+1):
+        curlvl(root, i)
+
+# Print the node at curlvl
+def curlvl(root, level):
+    global Rteam
+    if root is None or root.val == 0:
+        return
+    if level == 1:
+        if root.red == False:
+            Rteam.append(root.val)
         else:
-            y.right = node
+            Bteam.append(root.val)
+        #print(root.val, end=" ")
+    elif level > 1:
+        curlvl(root.left, level-1)
+        curlvl(root.right, level-1)
 
-        if node.parent == None:
-            node.color = 0
-            return
+def height(node):
+    if node is None:
+        return 0
+    else:
+        lheight = height(node.left)
+        rheight = height(node.right)
+ 
+        if lheight > rheight:
+            return lheight+1
+        else:
+            return rheight+1
 
-        if node.parent.parent == None:
-            return
+# main
+t = RBTree()
+a = list(map(int, input().split()))
 
-        self.fix_insert(node)
-
-    def get_root(self):
-        return self.root
-
-    def delete_node(self, item):
-        self.delete_node_helper(self.root, item)
-
-    def print_tree(self):
-        self.__print_helper(self.root, "", True)
+for i in (a):
+    if i != 0:
+        t.insert(int(i))
 
 
+lvlord(t.root)
+
+if (len(Rteam) < 4) or (len(Bteam) < 4):
+    print("No game")
+
+else:
+# Red Team
+    Rj = Rteam[0]
+    for i in range(len(Rteam) - 1, len(Rteam) - 4, -1):
+        Ro.append(Rteam[i])
+    Ro.sort()
+
+    Rteam.sort()
+    print("Red team:", end=' ')
+    for i in range(len(Rteam)):
+        if i < (len(Rteam) - 1):
+            print(Rteam[i], end=',')
+        else:
+            print(Rteam[i])
+
+    # Red outfield
+
+    print("outfield:", end=' ')
+    for i in range(len(Ro)):
+        if i < (len(Ro) - 1):
+            print(Ro[i], end=',')
+        else:
+            print(Ro[i])
+
+    # Red jump
+    print("jump ball:", Rj)
 
 
-if __name__ == "__main__":
-    a = list(map(int, input().split()))
+    # Black Team
+    Bj = Bteam[0]
+    for i in range(len(Bteam) - 1, len(Bteam) - 4, -1):
+        Bo.append(Bteam[i])
+    Bo.sort()
 
-    r = RedBlackTree()
-    for i in (a):
-        if i != 0:
-            r.insert(int(i))
+    Bteam.sort()
+    print("Black team:", end=' ')
+    for i in range(len(Bteam)):
+        if i < (len(Bteam) - 1):
+            print(Bteam[i], end=',')
+        else:
+            print(Bteam[i])
 
-    r.preorder(len(a))
+    # Black outfield
+    print("outfield:", end=' ')
+    for i in range(len(Bo)):
+        if i < (len(Bo) - 1):
+            print(Bo[i], end=',')
+        else:
+            print(Bo[i])
 
+    # Black jump
+    print("jump ball:", Bj)
